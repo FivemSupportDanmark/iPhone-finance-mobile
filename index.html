@@ -1,0 +1,594 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<title>Magnus Finance Mobile</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#090d13">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Magnus Finance">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<style>
+:root{
+ --bg:#090d13;--panel:#111824;--panel2:#172131;--line:#263248;--text:#f6f8fb;
+ --muted:#8c98aa;--accent:#6aa5ff;--green:#46d17f;--red:#ff6d75;--yellow:#f3ca65;
+}
+*{box-sizing:border-box} body{margin:0;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom);background:radial-gradient(circle at 85% 0,rgba(72,110,215,.14),transparent 30%),var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
+.app{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
+aside{border-right:1px solid var(--line);padding:calc(26px + env(safe-area-inset-top)) 18px 26px;background:rgba(8,12,18,.96);position:sticky;top:0;height:100vh}
+.brand{font-size:18px;font-weight:900;letter-spacing:.8px;margin-bottom:30px}.brand span{color:var(--accent)}
+nav button{width:100%;border:0;background:transparent;color:var(--muted);padding:12px 14px;margin:4px 0;border-radius:12px;text-align:left;font-size:14px;cursor:pointer}
+nav button.active,nav button:hover{background:var(--panel2);color:#fff}
+main{padding:30px;max-width:1550px}
+.section{display:none}.section.active{display:block}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:14px;margin-bottom:20px}
+h1{margin:0;font-size:28px}.sub{color:var(--muted);font-size:14px;margin-top:4px}
+.pill{background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:9px 12px;color:var(--muted);font-size:13px}
+.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}
+.card{background:linear-gradient(180deg,rgba(22,30,43,.98),rgba(15,22,32,.98));border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:0 12px 35px rgba(0,0,0,.15)}
+.metric{grid-column:span 3}.half{grid-column:span 6}.wide{grid-column:span 8}.side{grid-column:span 4}.full{grid-column:span 12}
+.card h3{margin:0 0 14px;font-size:14px;color:#cbd4df}.big{font-size:30px;font-weight:850;letter-spacing:-.7px}.good{color:var(--green)}.bad{color:var(--red)}.muted{color:var(--muted)}.small{font-size:12px}
+.row{display:flex;justify-content:space-between;gap:14px;align-items:center;margin:10px 0}
+.bar{height:10px;background:#202a3b;border-radius:99px;overflow:hidden;margin-top:10px}.bar>div{height:100%;background:linear-gradient(90deg,var(--accent),#8876ff);width:0%;transition:.25s}
+.chart{height:205px;display:flex;align-items:flex-end;gap:8px;padding-top:14px;margin-bottom:20px}.col{flex:1;min-height:6px;background:linear-gradient(180deg,rgba(106,165,255,.95),rgba(106,165,255,.18));border-radius:8px 8px 3px 3px;position:relative}.col span{position:absolute;bottom:-25px;left:50%;transform:translateX(-50%);font-size:10px;color:var(--muted)}
+.button{border:0;border-radius:11px;padding:10px 14px;background:var(--accent);color:#07111f;font-weight:800;cursor:pointer}.button.secondary{background:#1a2230;color:white;border:1px solid var(--line)}.button.danger{background:#2a1519;color:#ff9aa0;border:1px solid #4b232a}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+input,select{width:100%;background:#0d141f;border:1px solid var(--line);color:white;border-radius:10px;padding:10px 12px;outline:none}input:focus,select:focus{border-color:var(--accent)}
+.input-row{display:grid;grid-template-columns:1fr 165px;gap:12px;align-items:center;margin:12px 0}
+label.mini{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}
+.importbox{border:1px dashed #405170;border-radius:16px;padding:24px;text-align:center;background:#0d141f}
+.importbox input{max-width:440px;margin:12px auto}
+.notice{padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:#101722;color:var(--muted);font-size:13px}
+table{width:100%;border-collapse:collapse}th,td{padding:10px 8px;border-bottom:1px solid var(--line);text-align:left;font-size:13px}th{color:var(--muted);font-size:11px}.right{text-align:right}
+.badge{display:inline-block;padding:5px 8px;border:1px solid var(--line);border-radius:9px;font-size:11px;color:var(--muted)}
+.filters{display:grid;grid-template-columns:2fr 1fr 1fr;gap:10px;margin-bottom:14px}
+.hero{background:linear-gradient(135deg,#1c2636,#10161f);border:1px solid var(--line);padding:20px;border-radius:16px}
+.hero .name{font-size:21px;font-weight:850}.switches{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.switches button{border:1px solid var(--line);background:#101722;color:var(--muted);padding:8px 10px;border-radius:10px;cursor:pointer}.switches button.active{background:#1c2a40;color:white;border-color:#49678f}
+.category-select{min-width:160px;padding:7px 8px;font-size:12px}
+@media(max-width:1050px){.metric{grid-column:span 6}.half,.wide,.side{grid-column:span 12}.filters{grid-template-columns:1fr}}
+@media(max-width:760px){.app{grid-template-columns:1fr}aside{position:static;height:auto;border-right:0;border-bottom:1px solid var(--line)}nav{display:flex;overflow:auto;gap:8px}nav button{white-space:nowrap;width:auto}main{padding:18px}.metric,.half,.wide,.side,.full{grid-column:span 12}.input-row{grid-template-columns:1fr}}
+</style>
+
+<style id="mobile-v5-overrides">
+@media (max-width: 760px){
+  html,body{overscroll-behavior-y:none}
+  body{
+    padding-top:env(safe-area-inset-top);
+    padding-bottom:calc(78px + env(safe-area-inset-bottom));
+    background:#090d13;
+  }
+
+  .app{display:block;min-height:100vh}
+
+  aside{
+    position:fixed !important;
+    left:0;right:0;bottom:0;top:auto !important;
+    height:auto !important;
+    z-index:9999;
+    padding:8px 8px calc(8px + env(safe-area-inset-bottom)) !important;
+    border-right:0 !important;
+    border-top:1px solid var(--line);
+    border-bottom:0 !important;
+    background:rgba(9,13,19,.96);
+    backdrop-filter:blur(18px);
+    -webkit-backdrop-filter:blur(18px);
+  }
+
+  .brand{display:none}
+  nav{
+    display:grid !important;
+    grid-template-columns:repeat(6,1fr);
+    gap:4px;
+    overflow:visible !important;
+  }
+
+  nav button{
+    width:auto !important;
+    min-width:0;
+    margin:0;
+    padding:9px 2px 7px;
+    border-radius:12px;
+    text-align:center;
+    font-size:0;
+    line-height:1;
+    color:var(--muted);
+  }
+
+  nav button::first-letter{font-size:21px}
+  nav button.active{
+    background:#172131;
+    color:#fff;
+  }
+
+  nav button[data-page="dashboard"]::after{content:"Nu"}
+  nav button[data-page="transactions"]::after{content:"Køb"}
+  nav button[data-page="import"]::after{content:"Import"}
+  nav button[data-page="bmw"]::after{content:"BMW"}
+  nav button[data-page="budget"]::after{content:"Forbrug"}
+  nav button[data-page="settings"]::after{content:"Setup"}
+
+  nav button::after{
+    display:block;
+    margin-top:5px;
+    font-size:9px;
+    font-weight:700;
+    letter-spacing:.1px;
+  }
+
+  main{
+    padding:14px 12px 20px !important;
+    max-width:none;
+  }
+
+  .topbar{
+    align-items:flex-start;
+    margin-bottom:14px;
+    gap:8px;
+  }
+
+  h1{
+    font-size:24px;
+    line-height:1.08;
+    letter-spacing:-.4px;
+  }
+
+  .sub{
+    font-size:12px;
+    line-height:1.35;
+    max-width:95%;
+  }
+
+  .pill{
+    padding:7px 9px;
+    font-size:10px;
+    white-space:nowrap;
+  }
+
+  .grid{
+    grid-template-columns:1fr !important;
+    gap:10px;
+  }
+
+  .metric,.half,.wide,.side,.full{
+    grid-column:1 !important;
+  }
+
+  .card{
+    border-radius:16px;
+    padding:16px;
+    box-shadow:none;
+  }
+
+  .card h3{
+    font-size:12px;
+    margin-bottom:10px;
+  }
+
+  .big{
+    font-size:27px;
+  }
+
+  .small{font-size:11px}
+
+  /* top metrics become compact 2-column tiles */
+  #dashboard .grid{
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  }
+  #dashboard .metric{
+    grid-column:span 1 !important;
+    min-height:112px;
+  }
+  #dashboard .wide,
+  #dashboard .side,
+  #dashboard .half{
+    grid-column:span 2 !important;
+  }
+  #dashboard .metric .big{
+    font-size:22px;
+    word-break:break-word;
+  }
+
+  .chart{
+    height:155px;
+    gap:4px;
+    margin-bottom:18px;
+  }
+  .col span{font-size:8px;bottom:-18px}
+
+  .row{
+    margin:8px 0;
+    gap:8px;
+    align-items:flex-start;
+  }
+
+  .row > :first-child{
+    min-width:0;
+  }
+
+  .input-row{
+    grid-template-columns:1fr !important;
+    gap:5px;
+    margin:11px 0;
+  }
+
+  input,select{
+    min-height:46px;
+    font-size:16px; /* prevents iOS zoom */
+    border-radius:12px;
+  }
+
+  .button{
+    min-height:44px;
+    border-radius:12px;
+    font-size:14px;
+  }
+
+  .actions .button{
+    flex:1;
+  }
+
+  .filters{
+    display:grid;
+    grid-template-columns:1fr !important;
+    gap:8px;
+  }
+
+  /* mobile cards instead of wide transaction table */
+  #transactions .card{
+    padding:12px;
+  }
+  #transactions table,
+  #transactions thead,
+  #transactions tbody,
+  #transactions tr,
+  #transactions th,
+  #transactions td{
+    display:block;
+    width:100%;
+  }
+  #transactions thead{display:none}
+  #transactions tr{
+    margin:0 0 10px;
+    padding:12px;
+    border:1px solid var(--line);
+    border-radius:14px;
+    background:#0d141f;
+  }
+  #transactions td{
+    border:0;
+    padding:4px 0;
+    text-align:left !important;
+  }
+  #transactions td:nth-child(1){
+    font-size:10px;color:var(--muted)
+  }
+  #transactions td:nth-child(2){
+    font-size:14px;font-weight:750
+  }
+  #transactions td:nth-child(4){
+    font-size:10px;color:var(--muted)
+  }
+  #transactions td:nth-child(5){
+    font-size:17px;font-weight:800;margin-top:3px
+  }
+  .category-select{
+    min-width:0;
+    width:100%;
+    margin:5px 0;
+    font-size:14px;
+    min-height:40px;
+  }
+
+  .importbox{
+    padding:20px 12px;
+  }
+  .importbox input{
+    max-width:none;
+  }
+
+  .hero{
+    padding:16px;
+  }
+
+  .hero .name{
+    font-size:19px;
+  }
+
+  .notice{
+    font-size:12px;
+    line-height:1.45;
+  }
+
+  #budgetRows .row span,
+  #categorySummary .row span{
+    font-size:12px;
+  }
+}
+
+/* small iPhones */
+@media (max-width: 390px){
+  #dashboard .grid{gap:8px}
+  .card{padding:14px}
+  #dashboard .metric{min-height:105px}
+  #dashboard .metric .big{font-size:20px}
+  nav button::after{font-size:8px}
+}
+</style>
+
+</head>
+<body>
+<div class="app">
+<aside>
+ <div class="brand">MAGNUS <span>FINANCE</span></div>
+ <nav>
+  <button class="active" data-page="dashboard">◼ Lige nu</button>
+  <button data-page="transactions">▤ Transaktioner</button>
+  <button data-page="import">⇧ Bankimport</button>
+  <button data-page="bmw">◆ Efter BMW</button>
+  <button data-page="budget">◎ Forbrug</button>
+  <button data-page="settings">⚙ Indstillinger</button>
+ </nav>
+</aside>
+
+<main>
+<section id="dashboard" class="section active">
+ <div class="topbar"><div><h1>Din økonomi lige nu</h1><div class="sub">Ingen biludgifter blandes ind før du faktisk har bilen</div></div><div class="pill" id="monthPill"></div></div>
+ <div class="grid">
+  <div class="card metric"><h3>Opsparing</h3><div class="big" id="savingNow"></div><div class="small muted">Manuelt angivet samlet opsparing</div></div>
+  <div class="card metric"><h3>VISA-konto</h3><div class="big" id="accountBalance"></div><div class="small muted">Seneste saldo fra bankfil</div></div>
+  <div class="card metric"><h3>Forbrug denne måned</h3><div class="big bad" id="spendMonth"></div><div class="small muted">Ekskl. interne overførsler</div></div>
+  <div class="card metric"><h3>Indtægt denne måned</h3><div class="big good" id="incomeMonth"></div><div class="small muted">Ekskl. egne overførsler</div></div>
+
+  <div class="card wide"><h3>Dagligt forbrug denne måned</h3><div class="chart" id="spendChart"></div></div>
+  <div class="card side">
+   <h3>Hvor går pengene hen?</h3><div id="categorySummary"></div>
+  </div>
+
+  <div class="card half"><h3>Opsparingsmål</h3><div class="row"><span id="goalName">BMW / næste mål</span><span class="badge" id="goalAmount"></span></div><div class="bar"><div id="goalBar"></div></div><div class="small muted" id="goalText" style="margin-top:10px"></div></div>
+  <div class="card half"><h3>Seneste køb</h3><div id="recent"></div></div>
+ </div>
+</section>
+
+<section id="transactions" class="section">
+ <div class="topbar"><div><h1>Transaktioner</h1><div class="sub">Ret kategorierne så appen lærer din økonomi at kende</div></div></div>
+ <div class="card">
+  <div class="filters"><input id="searchTx" placeholder="Søg fx Shell, Bilka, MobilePay..."><select id="filterCategory"><option value="">Alle kategorier</option></select><select id="filterMonth"><option value="">Alle måneder</option></select></div>
+  <div style="overflow:auto"><table><thead><tr><th>Dato</th><th>Tekst</th><th>Kategori</th><th>Bankens kategori</th><th class="right">Beløb</th></tr></thead><tbody id="txBody"></tbody></table></div>
+ </div>
+</section>
+
+<section id="import" class="section">
+ <div class="topbar"><div><h1>Importér fra Jyske Bank</h1><div class="sub">CSV-filen bliver behandlet lokalt i browseren</div></div></div>
+ <div class="grid">
+  <div class="card full">
+   <div class="importbox">
+    <div class="big" style="font-size:22px">Jyske Bank CSV</div>
+    <div class="muted small" style="margin-top:8px">Vælg filen fra “Print og eksporter”. Kontonummer, kommentar og andre unødvendige felter gemmes ikke.</div>
+    <input type="file" id="csvFile" accept=".csv,text/csv">
+    <div><button class="button" id="importBtn">Importér fil</button></div>
+    <div class="small muted" id="importStatus" style="margin-top:12px"></div>
+   </div>
+  </div>
+  <div class="card half"><h3>Dine standardregler</h3>
+   <div class="row"><span>Shell / Bilka / Rema / Netto</span><strong>Snacks & småkøb</strong></div>
+   <div class="row"><span>Burger King / café osv.</span><strong>Fastfood & café</strong></div>
+   <div class="row"><span>BoligOpsparing</span><strong>Intern overførsel</strong></div>
+   <div class="row"><span>Tankstation ≠ automatisk bil</span><strong class="good">Ja</strong></div>
+  </div>
+  <div class="card half"><h3>Privatliv</h3>
+   <div class="notice">Appen gemmer kun dato, tekst, beløb, din kategori, bankens kategori og saldo. <strong>Kontonummer gemmes ikke.</strong> Data ligger kun i browserens localStorage.</div>
+  </div>
+ </div>
+</section>
+
+<section id="bmw" class="section">
+ <div class="topbar"><div><h1>Efter BMW</h1><div class="sub">Et separat scenarie — påvirker ikke dit faktiske forbrug</div></div></div>
+ <div class="grid">
+  <div class="card half">
+   <h3>Scenarie</h3>
+   <div class="input-row"><label>Opsparing nu</label><input id="simSavings" type="number"></div>
+   <div class="input-row"><label>Bilpris</label><input id="simPrice" type="number"></div>
+   <div class="input-row"><label>Nettoindkomst / md.</label><input id="simIncome" type="number"></div>
+   <div class="input-row"><label>Personligt forbrug / md.</label><input id="simPersonal" type="number"></div>
+   <div class="input-row"><label>Forsikring / md.</label><input id="simInsurance" type="number"></div>
+   <div class="input-row"><label>Benzin / md.</label><input id="simFuel" type="number"></div>
+   <div class="input-row"><label>Service-reserve / md.</label><input id="simService" type="number"></div>
+   <div class="input-row"><label>Afgift + andet / md.</label><input id="simOther" type="number"></div>
+  </div>
+  <div class="card half">
+   <div class="hero"><div class="name">BMW 118i M-Sport</div><div class="small muted">Planlægningsscenarie</div>
+    <div class="row" style="margin-top:18px"><span class="muted">Bil pr. måned</span><strong id="bmwMonthly"></strong></div>
+    <div class="row"><span class="muted">Bil pr. år</span><strong id="bmwAnnual"></strong></div>
+    <div class="row"><span class="muted">Tilbage efter bilkøb</span><strong id="afterBuy"></strong></div>
+    <div class="row"><span class="muted">Månedligt overskud bagefter</span><strong id="afterSurplus"></strong></div>
+    <div class="row"><span class="muted">Opsparingsrate bagefter</span><strong id="afterRate"></strong></div>
+   </div>
+   <div class="notice" style="margin-top:14px" id="bmwComment"></div>
+  </div>
+ </div>
+</section>
+
+<section id="budget" class="section">
+ <div class="topbar"><div><h1>Dit reelle forbrug</h1><div class="sub">Baseret på banktransaktionerne — ikke på et generisk madbudget</div></div></div>
+ <div class="grid">
+  <div class="card wide"><h3>Kategorier</h3><div id="budgetRows"></div></div>
+  <div class="card side"><h3>Vigtigt</h3><div class="notice">“Mad” antages ikke som en fast leveomkostning. Snacks, takeaway og småindkøb vises som dit personlige forbrug, fordi almindelig mad hjemme ikke er din udgift.</div></div>
+ </div>
+</section>
+
+<section id="settings" class="section">
+ <div class="topbar"><div><h1>Indstillinger</h1><div class="sub">Dine egne tal</div></div></div>
+ <div class="grid">
+  <div class="card half">
+   <h3>Lige nu</h3>
+   <div class="input-row"><label>Samlet opsparing</label><input id="settingSavings" type="number"></div>
+   <div class="input-row"><label>Opsparingsmål</label><input id="settingGoal" type="number"></div>
+   <div class="input-row"><label>Nettoindkomst / md.</label><input id="settingIncome" type="number"></div>
+  </div>
+  <div class="card half">
+   <h3>BMW-scenarie standard</h3>
+   <div class="input-row"><label>Bilpris</label><input id="settingCarPrice" type="number"></div>
+   <div class="input-row"><label>Forsikring</label><input id="settingInsurance" type="number"></div>
+   <div class="input-row"><label>Benzin</label><input id="settingFuel" type="number"></div>
+   <div class="input-row"><label>Service-reserve</label><input id="settingService" type="number"></div>
+   <div class="input-row"><label>Afgift + andet</label><input id="settingOther" type="number"></div>
+  </div>
+  <div class="card full"><div class="actions"><button class="button secondary" id="exportBtn">Eksportér backup</button><button class="button danger" id="resetBtn">Nulstil app</button></div></div>
+ </div>
+</section>
+</main>
+</div>
+
+<script>
+const PRELOADED = [];
+const KEY="magnusFinanceV3";
+const CATEGORIES=["Snacks & småkøb","Fastfood & café","Hygge & fritid","Shopping & diverse","Streaming & abonnementer","Bilpleje / hobby","MobilePay / venner","Løn","Anden indtægt","Overførsel mellem egne konti","Andet"];
+const DEFAULTS={settings:{savings:104000,goal:150000,income:15000,carPrice:150000,insurance:1500,fuel:1000,service:600,other:300},transactions:PRELOADED};
+
+const el=id=>document.getElementById(id);
+const kr=n=>(Math.round((Number(n)||0)*100)/100).toLocaleString("da-DK",{minimumFractionDigits:0,maximumFractionDigits:2})+" kr.";
+function clone(x){return JSON.parse(JSON.stringify(x))}
+function load(){try{const s=JSON.parse(localStorage.getItem(KEY));return s&&s.settings&&Array.isArray(s.transactions)?s:clone(DEFAULTS)}catch{return clone(DEFAULTS)}}
+let state=load();
+function save(){localStorage.setItem(KEY,JSON.stringify(state))}
+function activeTx(){return state.transactions.filter(t=>t.type!=="transfer")}
+function currentMonth(){return new Date().toISOString().slice(0,7)}
+function monthTx(){return activeTx().filter(t=>t.date.slice(0,7)===currentMonth())}
+function expenses(arr=monthTx()){return arr.filter(t=>t.type==="expense").reduce((a,t)=>a+Number(t.amount),0)}
+function incomes(arr=monthTx()){return arr.filter(t=>t.type==="income").reduce((a,t)=>a+Number(t.amount),0)}
+function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+
+function renderDashboard(){
+ const s=state.settings, tx=[...state.transactions].sort((a,b)=>b.date.localeCompare(a.date)||b.id-a.id);
+ const latest=tx.find(x=>Number.isFinite(Number(x.balance)));
+ const spend=expenses(), inc=incomes(), goal=Number(s.goal), pct=goal?Math.min(100,Math.max(0,Number(s.savings)/goal*100)):0;
+ el("savingNow").textContent=kr(s.savings);
+ el("accountBalance").textContent=latest?kr(latest.balance):"—";
+ el("spendMonth").textContent="-"+kr(spend);
+ el("incomeMonth").textContent="+"+kr(inc);
+ el("goalAmount").textContent=kr(goal);el("goalBar").style.width=pct+"%";el("goalText").textContent=Math.round(pct)+"% · "+kr(Math.max(0,goal-s.savings))+" tilbage";
+ renderSpendChart();renderCategorySummary();renderRecent();
+}
+function renderSpendChart(){
+ const tx=monthTx().filter(t=>t.type==="expense"), days={};
+ tx.forEach(t=>days[t.date]=(days[t.date]||0)+Number(t.amount));
+ const entries=Object.entries(days).sort((a,b)=>a[0].localeCompare(b[0])).slice(-18);
+ const chart=el("spendChart");chart.innerHTML="";
+ if(!entries.length){chart.innerHTML='<div class="muted small">Ingen køb denne måned</div>';return}
+ const max=Math.max(...entries.map(x=>x[1]));
+ entries.forEach(([d,v])=>{const c=document.createElement("div");c.className="col";c.style.height=(20+80*v/max)+"%";c.title=d+" · "+kr(v);const sp=document.createElement("span");sp.textContent=d.slice(8);c.appendChild(sp);chart.appendChild(c)})
+}
+function renderCategorySummary(){
+ const sums={};monthTx().filter(t=>t.type==="expense").forEach(t=>sums[t.category]=(sums[t.category]||0)+Number(t.amount));
+ const arr=Object.entries(sums).sort((a,b)=>b[1]-a[1]).slice(0,6), total=arr.reduce((a,x)=>a+x[1],0)||1;
+ el("categorySummary").innerHTML=arr.length?arr.map(([k,v])=>`<div style="margin:12px 0"><div class="row"><span>${esc(k)}</span><strong>${kr(v)}</strong></div><div class="bar"><div style="width:${Math.min(100,v/total*100)}%"></div></div></div>`).join(""):'<div class="muted small">Ingen data endnu</div>';
+}
+function renderRecent(){
+ const arr=[...monthTx()].filter(t=>t.type==="expense").sort((a,b)=>b.date.localeCompare(a.date)||b.id-a.id).slice(0,5);
+ el("recent").innerHTML=arr.length?arr.map(t=>`<div class="row"><div><strong>${esc(t.description)}</strong><div class="small muted">${t.date} · ${esc(t.category)}</div></div><strong class="bad">-${kr(t.amount)}</strong></div>`).join(""):'<div class="muted small">Ingen køb endnu</div>';
+}
+
+function renderFilters(){
+ const fc=el("filterCategory"), old=fc.value;fc.innerHTML='<option value="">Alle kategorier</option>'+CATEGORIES.map(c=>`<option>${esc(c)}</option>`).join("");fc.value=old;
+ const months=[...new Set(state.transactions.map(t=>t.date.slice(0,7)))].sort().reverse(),fm=el("filterMonth"),om=fm.value;
+ fm.innerHTML='<option value="">Alle måneder</option>'+months.map(m=>`<option value="${m}">${m}</option>`).join("");fm.value=om;
+}
+function renderTransactions(){
+ renderFilters();
+ const q=el("searchTx").value.toLowerCase(),cat=el("filterCategory").value,mo=el("filterMonth").value;
+ const arr=[...state.transactions].filter(t=>(!q||t.description.toLowerCase().includes(q))&&(!cat||t.category===cat)&&(!mo||t.date.startsWith(mo))).sort((a,b)=>b.date.localeCompare(a.date)||b.id-a.id).slice(0,300);
+ el("txBody").innerHTML=arr.map(t=>`<tr><td>${t.date}</td><td>${esc(t.description)}</td><td><select class="category-select" onchange="changeCategory(${t.id},this.value)">${CATEGORIES.map(c=>`<option ${c===t.category?"selected":""}>${esc(c)}</option>`).join("")}</select></td><td class="muted">${esc(t.bankCategory||"")}</td><td class="right ${t.type==="income"?"good":t.type==="expense"?"bad":"muted"}">${t.type==="income"?"+":t.type==="expense"?"-":""}${kr(t.amount)}</td></tr>`).join("");
+}
+window.changeCategory=function(id,category){
+ const t=state.transactions.find(x=>x.id===id);if(!t)return;t.category=category;
+ if(category==="Overførsel mellem egne konti")t.type="transfer";
+ else if(["Løn","Anden indtægt"].includes(category))t.type="income";
+ else t.type="expense";
+ save();renderAll();
+}
+
+function renderBudget(){
+ const sums={};activeTx().filter(t=>t.type==="expense"&&t.date.startsWith(currentMonth())).forEach(t=>sums[t.category]=(sums[t.category]||0)+Number(t.amount));
+ const arr=Object.entries(sums).sort((a,b)=>b[1]-a[1]),total=arr.reduce((a,x)=>a+x[1],0);
+ el("budgetRows").innerHTML=arr.length?arr.map(([k,v])=>`<div style="margin:14px 0"><div class="row"><span>${esc(k)}</span><strong>${kr(v)}</strong></div><div class="bar"><div style="width:${total?100*v/total:0}%"></div></div></div>`).join(""):'<div class="muted small">Ingen udgifter denne måned</div>';
+}
+function renderSettings(){
+ const s=state.settings;
+ el("settingSavings").value=s.savings;el("settingGoal").value=s.goal;el("settingIncome").value=s.income;el("settingCarPrice").value=s.carPrice;el("settingInsurance").value=s.insurance;el("settingFuel").value=s.fuel;el("settingService").value=s.service;el("settingOther").value=s.other;
+}
+function syncBmw(){
+ const s=state.settings;
+ if(!el("simSavings").dataset.touched)el("simSavings").value=s.savings;
+ if(!el("simPrice").dataset.touched)el("simPrice").value=s.carPrice;
+ if(!el("simIncome").dataset.touched)el("simIncome").value=s.income;
+ if(!el("simPersonal").dataset.touched)el("simPersonal").value=Math.round(expenses());
+ if(!el("simInsurance").dataset.touched)el("simInsurance").value=s.insurance;
+ if(!el("simFuel").dataset.touched)el("simFuel").value=s.fuel;
+ if(!el("simService").dataset.touched)el("simService").value=s.service;
+ if(!el("simOther").dataset.touched)el("simOther").value=s.other;
+ renderBmw();
+}
+function renderBmw(){
+ const v=id=>Number(el(id).value||0),sav=v("simSavings"),price=v("simPrice"),inc=v("simIncome"),personal=v("simPersonal"),car=v("simInsurance")+v("simFuel")+v("simService")+v("simOther"),sur=inc-personal-car,rate=inc?sur/inc*100:0,after=sav-price;
+ el("bmwMonthly").textContent=kr(car);el("bmwAnnual").textContent=kr(car*12);el("afterBuy").textContent=kr(after);el("afterBuy").className=after>=0?"good":"bad";
+ el("afterSurplus").textContent=(sur>=0?"+":"")+kr(sur);el("afterSurplus").className=sur>=0?"good":"bad";el("afterRate").textContent=Math.round(rate)+"%";
+ el("bmwComment").textContent=after<0?"Med de indtastede tal kan bilen ikke købes kontant alene fra den nuværende opsparing.":sur<0?"Bilen giver negativt månedligt cashflow i scenariet.":"Bilen holdes helt adskilt fra dit faktiske dashboard, indtil du vælger at gøre den til en rigtig udgift.";
+}
+function updateSettings(){
+ const s=state.settings;s.savings=Number(el("settingSavings").value||0);s.goal=Number(el("settingGoal").value||0);s.income=Number(el("settingIncome").value||0);s.carPrice=Number(el("settingCarPrice").value||0);s.insurance=Number(el("settingInsurance").value||0);s.fuel=Number(el("settingFuel").value||0);s.service=Number(el("settingService").value||0);s.other=Number(el("settingOther").value||0);save();renderDashboard();renderBudget();syncBmw();
+}
+function parseDkNumber(s){return Number(String(s||"").trim().replace(/\./g,"").replace(",","."))||0}
+function toIso(s){const p=String(s||"").split(".");return p.length===3?`${p[2]}-${p[1]}-${p[0]}`:s}
+function autoClassify(desc,main,bankCat,amt){
+ const t=(desc||"").toUpperCase();
+ if(t.includes("BOLIGOPSPARING"))return ["Overførsel mellem egne konti","transfer"];
+ if(["SHELL","REMA","BILKA","NETTO","FØTEX","FOETEX","365DISCOUNT","COOP","MENY"].some(x=>t.includes(x)))return ["Snacks & småkøb",amt<0?"expense":"income"];
+ if(["BURGER KING","MCDONALD","SUNSET","CAFE ","CAFÉ ","PIZZA","KEBAB"].some(x=>t.includes(x)))return ["Fastfood & café",amt<0?"expense":"income"];
+ if(["BLOCKBUSTER","SPOTIFY","NETFLIX","DISNEY","HBO","APPLE.COM/BILL"].some(x=>t.includes(x)))return ["Streaming & abonnementer",amt<0?"expense":"income"];
+ if(t.includes("STOEVSUGER")||t.includes("BILVASK"))return ["Bilpleje / hobby",amt<0?"expense":"income"];
+ if(t.includes("MOBILEPAY"))return ["MobilePay / venner",amt<0?"expense":"income"];
+ if(amt>0)return ["Anden indtægt","income"];
+ return ["Andet","expense"];
+}
+function splitCSVLine(line){
+ const out=[];let cur="",quote=false;
+ for(let i=0;i<line.length;i++){const ch=line[i];if(ch==='"'){if(quote&&line[i+1]==='"'){cur+='"';i++}else quote=!quote}else if(ch===';'&&!quote){out.push(cur);cur=""}else cur+=ch}out.push(cur);return out;
+}
+function importCSV(text){
+ const lines=text.replace(/^\uFEFF/,"").split(/\r?\n/).filter(Boolean);if(lines.length<2)throw new Error("Filen ser tom ud.");
+ const heads=splitCSVLine(lines[0]),idx=n=>heads.indexOf(n);
+ if(idx("Dato")<0||idx("Tekst")<0||idx("Beløb")<0)throw new Error("Jeg kan ikke genkende Jyske Bank-formatet.");
+ const existing=new Set(state.transactions.map(t=>`${t.date}|${t.description}|${Number(t.amount).toFixed(2)}`));let added=0;
+ for(let i=1;i<lines.length;i++){
+  const a=splitCSVLine(lines[i]),amt=parseDkNumber(a[idx("Beløb")]),date=toIso(a[idx("Dato")]),desc=a[idx("Tekst")]||"",bankCat=idx("Kategori")>=0?a[idx("Kategori")]:"",main=idx("Hovedkategori")>=0?a[idx("Hovedkategori")]:"",balance=idx("Saldo")>=0?parseDkNumber(a[idx("Saldo")]):null;
+  const fp=`${date}|${desc}|${Math.abs(amt).toFixed(2)}`;if(existing.has(fp))continue;
+  const [category,type]=autoClassify(desc,main,bankCat,amt);
+  state.transactions.push({id:Date.now()+i,date,description:desc,amount:Math.abs(amt),type,category,bankCategory:bankCat,bankMainCategory:main,balance,source:"Jyske Bank CSV"});existing.add(fp);added++;
+ }
+ save();return added;
+}
+function renderAll(){renderDashboard();renderTransactions();renderBudget();renderSettings();syncBmw()}
+
+["searchTx","filterCategory","filterMonth"].forEach(id=>el(id).addEventListener(id==="searchTx"?"input":"change",renderTransactions));
+["settingSavings","settingGoal","settingIncome","settingCarPrice","settingInsurance","settingFuel","settingService","settingOther"].forEach(id=>el(id).addEventListener("input",updateSettings));
+["simSavings","simPrice","simIncome","simPersonal","simInsurance","simFuel","simService","simOther"].forEach(id=>el(id).addEventListener("input",()=>{el(id).dataset.touched="1";renderBmw()}));
+el("importBtn").addEventListener("click",async()=>{const f=el("csvFile").files[0];if(!f){el("importStatus").textContent="Vælg først en CSV-fil.";return}try{const n=importCSV(await f.text());el("importStatus").textContent=n?`Importeret ${n} nye transaktioner. Dubletter blev sprunget over.`:"Ingen nye transaktioner – de ser allerede ud til at være importeret.";renderAll()}catch(e){el("importStatus").textContent="Fejl: "+e.message}});
+el("exportBtn").addEventListener("click",()=>{const b=new Blob([JSON.stringify(state,null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="magnus-finance-v3-backup.json";a.click();URL.revokeObjectURL(a.href)});
+el("resetBtn").addEventListener("click",()=>{if(confirm("Nulstil appen?")){localStorage.removeItem(KEY);state=clone(DEFAULTS);document.querySelectorAll("[data-touched]").forEach(x=>delete x.dataset.touched);renderAll()}});
+document.querySelectorAll("nav button").forEach(btn=>btn.addEventListener("click",()=>{document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active"));btn.classList.add("active");document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));el(btn.dataset.page).classList.add("active")}));
+el("monthPill").textContent=new Date().toLocaleDateString("da-DK",{month:"long",year:"numeric"});
+renderAll();
+</script>
+
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./service-worker.js').catch(() => {});
+  });
+}
+</script>
+
+</body>
+</html>
